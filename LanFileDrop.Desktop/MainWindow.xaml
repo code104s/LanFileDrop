@@ -1,0 +1,258 @@
+<Window x:Class="LanFileDrop.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:core="clr-namespace:LanFileDrop.Core;assembly=LanFileDrop.Core"
+        Title="LanFileDrop" Width="1080" Height="720" MinWidth="860" MinHeight="580"
+        Icon="Assets/Logo/lanfiledrop.ico"
+        WindowStartupLocation="CenterScreen" Background="{DynamicResource WindowBrush}"
+        Foreground="{DynamicResource TextBrush}" AllowDrop="True" Drop="Window_Drop" DragOver="Window_DragOver">
+    <Window.Resources>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="14"/>
+        </Style>
+        <Style x:Key="TransferProgress" TargetType="ProgressBar">
+            <Setter Property="Height" Value="9"/><Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground"><Setter.Value><LinearGradientBrush StartPoint="0,0" EndPoint="1,0"><GradientStop Color="#6966F2"/><GradientStop Color="#9B7DF8" Offset="1"/></LinearGradientBrush></Setter.Value></Setter>
+            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ProgressBar">
+                <Grid><Border Background="{TemplateBinding Background}" CornerRadius="5"/>
+                    <Border x:Name="PART_Indicator" HorizontalAlignment="Left" Background="{TemplateBinding Foreground}" CornerRadius="5"/>
+                </Grid>
+            </ControlTemplate></Setter.Value></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Direction}" Value="{x:Static core:TransferDirection.Receive}">
+                    <Setter Property="Foreground"><Setter.Value><LinearGradientBrush StartPoint="0,0" EndPoint="1,0"><GradientStop Color="#14B88A"/><GradientStop Color="#55D6AD" Offset="1"/></LinearGradientBrush></Setter.Value></Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="26,20,26,18">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+
+        <Grid Margin="2,0,2,20">
+            <StackPanel Orientation="Horizontal">
+                <Border Width="42" Height="42" CornerRadius="11"><Image Source="Assets/Logo/lanfiledrop-64.png" Stretch="Uniform"/></Border>
+                <StackPanel Margin="12,0,0,0"><TextBlock Text="LanFileDrop" FontSize="23" FontWeight="Bold"/><TextBlock Foreground="{DynamicResource MutedBrush}" FontSize="12"><Run Text="Máy này: "/><Run Text="{Binding LocalDeviceName, Mode=OneWay}" FontWeight="SemiBold"/><Run Text="  •  Không cần Internet"/></TextBlock></StackPanel>
+            </StackPanel>
+            <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="{DynamicResource SurfaceAltBrush}" CornerRadius="12" Padding="12,7">
+                <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource MutedBrush}"/>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="300"/><ColumnDefinition Width="18"/><ColumnDefinition/></Grid.ColumnDefinitions>
+            <Border Style="{StaticResource Card}" Padding="14">
+                <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/></Grid.RowDefinitions>
+                    <Grid Margin="6,3,6,13"><TextBlock Text="THIẾT BỊ" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource MutedBrush}"/><TextBlock Text="TỰ ĐỘNG LÀM MỚI 5S" HorizontalAlignment="Right" FontSize="10" Foreground="{DynamicResource MutedBrush}"/></Grid>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice}" Background="Transparent" BorderThickness="0">
+                        <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0,0,0,7"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><Border x:Name="DeviceBorder" Background="Transparent" CornerRadius="10" Padding="10"><ContentPresenter/></Border><ControlTemplate.Triggers><Trigger Property="IsSelected" Value="True"><Setter TargetName="DeviceBorder" Property="Background" Value="{DynamicResource SurfaceAltBrush}"/><Setter TargetName="DeviceBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/><Setter TargetName="DeviceBorder" Property="BorderThickness" Value="1"/></Trigger><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="DeviceBorder" Property="Background" Value="{DynamicResource SurfaceAltBrush}"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter></Style></ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate><DataTemplate><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="44"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                            <Border x:Name="DeviceIcon" Width="36" Height="36" Background="{DynamicResource SurfaceAltBrush}" CornerRadius="10"><TextBlock FontSize="19" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource AccentBrush}"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Text" Value="▣"/><Style.Triggers><DataTrigger Binding="{Binding Kind}" Value="{x:Static core:DeviceKind.WebBrowser}"><Setter Property="Text" Value="📱"/></DataTrigger><DataTrigger Binding="{Binding Kind}" Value="{x:Static core:DeviceKind.ManualIp}"><Setter Property="Text" Value="⌁"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock Text="{Binding Name}" FontWeight="SemiBold"/><TextBlock Text="{Binding Address}" FontSize="12" Foreground="{DynamicResource MutedBrush}"/></StackPanel>
+                            <Ellipse Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Width="8" Height="8" Fill="{DynamicResource ReceiveBrush}">
+                                <Ellipse.Style><Style TargetType="Ellipse"><Style.Triggers><DataTrigger Binding="{Binding IsBusy}" Value="True"><Setter Property="Fill" Value="#F7A928"/><DataTrigger.EnterActions><BeginStoryboard><Storyboard RepeatBehavior="Forever" AutoReverse="True"><DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0.25" Duration="0:0:0.7"/></Storyboard></BeginStoryboard></DataTrigger.EnterActions></DataTrigger></Style.Triggers></Style></Ellipse.Style>
+                            </Ellipse>
+                        </Grid></DataTemplate></ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="20">
+                <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition/></Grid.RowDefinitions>
+                    <Grid Margin="2,0,2,13"><TextBlock Text="TRUYỀN FILE" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource MutedBrush}"/><TextBlock Text="HOẠT ĐỘNG GẦN ĐÂY" HorizontalAlignment="Right" FontSize="10" Foreground="{DynamicResource MutedBrush}"/></Grid>
+                    <Border Grid.Row="1" Background="{DynamicResource SurfaceAltBrush}" CornerRadius="12" Padding="14" Margin="0,0,0,12" MaxHeight="220" Visibility="{Binding HasTextMessages, Converter={StaticResource BoolToVisibility}}">
+                        <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Text="VĂN BẢN" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource MutedBrush}" Margin="2,0,0,7"/>
+                            <ListBox Grid.Row="1" ItemsSource="{Binding TextMessages}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Focusable" Value="False"/><Setter Property="Margin" Value="0,3"/></Style></ListBox.ItemContainerStyle>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="12" MinWidth="280" MaxWidth="500">
+                                            <Border.Style><Style TargetType="Border"><Setter Property="HorizontalAlignment" Value="Left"/><Style.Triggers><DataTrigger Binding="{Binding Direction}" Value="{x:Static core:TransferDirection.Send}"><Setter Property="HorizontalAlignment" Value="Right"/><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/><Setter Property="BorderThickness" Value="1"/></DataTrigger></Style.Triggers></Style></Border.Style>
+                                            <Grid>
+                                                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                                                <TextBlock Text="{Binding SenderName}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" TextTrimming="CharacterEllipsis"/>
+                                                <TextBox Grid.Row="1" Text="{Binding Content, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True" BorderThickness="0" Padding="0" Margin="0,6,0,0" MinWidth="250" MaxHeight="130" VerticalScrollBarVisibility="Auto" Background="Transparent" Foreground="{DynamicResource TextBrush}" FontSize="13"/>
+                                                <Grid Grid.Row="2" Margin="0,9,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                                    <Button Grid.Column="0" Content="⧉  Sao chép" Tag="{Binding Content}" Click="CopyText_Click" Padding="8,3" FontSize="10"/>
+                                                    <TextBlock Grid.Column="2" Text="{Binding Timestamp, StringFormat={}{0:HH:mm}}" FontSize="10" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                    <Grid Grid.Row="2">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasTransfers, Converter={StaticResource BoolToVisibility}}" Opacity="0" IsHitTestVisible="False"/>
+                        <TextBlock Text="Chọn thiết bị rồi thả file để bắt đầu" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}"/>
+                        <ListBox ItemsSource="{Binding TransferItems}" Background="Transparent" BorderThickness="0" Panel.ZIndex="2">
+                            <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="IsHitTestVisible" Value="True"/><Setter Property="Margin" Value="0,0,0,11"/><Setter Property="Focusable" Value="False"/></Style></ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate><DataTemplate><Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="12" Padding="15">
+                                <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                                    <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="{Binding FileName}" FontWeight="SemiBold" FontSize="15" TextTrimming="CharacterEllipsis" Margin="0,0,16,0"/><TextBlock Grid.Column="1" Text="{Binding StatusText}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"/></Grid>
+                                    <ProgressBar Grid.Row="1" Style="{StaticResource TransferProgress}" Value="{Binding Percentage, Mode=OneWay}" Maximum="100" Margin="0,11,0,8"/>
+                                    <Grid Grid.Row="2"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="{Binding SpeedText}" Foreground="{DynamicResource MutedBrush}"/><TextBlock Grid.Column="1" Text="{Binding EtaText}" Foreground="{DynamicResource MutedBrush}"/></Grid>
+                                    <Grid Grid.Row="3" Margin="0,10,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions><Border Background="{DynamicResource SurfaceBrush}" CornerRadius="6" Padding="7,3"><TextBlock Text="{Binding DirectionText}" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource MutedBrush}"/></Border><StackPanel Grid.Column="1" Margin="10,0,0,0"><TextBlock Text="{Binding Peer}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis"/><TextBlock Text="{Binding HashText}" FontSize="10" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/></StackPanel></Grid>
+                                    <Grid Grid.Row="4" Margin="0,10,0,0" Visibility="{Binding CanControl, Converter={StaticResource BoolToVisibility}}">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="{Binding PauseText}" Command="{Binding PauseCommand}" Padding="10,5" FontSize="11"/><Button Content="✕ Hủy" Command="{Binding CancelCommand}" Padding="10,5" Margin="7,0,0,0" FontSize="11" Foreground="{DynamicResource DangerBrush}"/></StackPanel>
+                                    </Grid>
+                                </Grid>
+                            </Border></DataTemplate></ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" Style="{StaticResource Card}" Margin="0,18,0,0" Padding="2">
+            <Grid x:Name="DropZone" MinHeight="92" Background="Transparent"><Rectangle Margin="7" RadiusX="10" RadiusY="10" Stroke="{DynamicResource BorderBrush}" StrokeDashArray="5,4" StrokeThickness="1.5" Fill="Transparent"/>
+                <Grid Margin="20,13"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"><TextBlock Text="📎" FontSize="24" Margin="0,0,11,0"/><StackPanel><TextBlock Text="Thả file hoặc thư mục vào đây" FontWeight="SemiBold"/><TextBlock Text="Chọn một thiết bị trước khi gửi" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,3,0,0"/></StackPanel></StackPanel>
+                    <WrapPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right"><Button Content="Chọn file" Command="{Binding BrowseCommand}"/><Button Content="Chọn thư mục" Command="{Binding BrowseFolderCommand}" Margin="7,0,0,0"/><Button Content="📝 Gửi văn bản" Command="{Binding SendTextCommand}" Margin="7,0,0,0" Background="{DynamicResource AccentBrush}" Foreground="White"/></WrapPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="3" Margin="2,13,2,0"><StackPanel Orientation="Horizontal"><Button Content="📱  Kết nối điện thoại" Command="{Binding OpenWebCommand}" Padding="10,6" Background="{DynamicResource AccentBrush}" Foreground="White"/><Button Content="📜  Lịch sử" Command="{Binding OpenHistoryCommand}" Padding="10,6" Margin="8,0,0,0"/><Button Content="⚙  Cài đặt" Command="{Binding OpenSettingsCommand}" Padding="10,6" Margin="8,0,0,0"/></StackPanel><TextBlock Text="UDP 49494  •  TCP 49495  •  WEB 49500" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" FontSize="11"/></Grid>
+
+        <!-- Incoming transfer toast -->
+        <Border Grid.RowSpan="4" Panel.ZIndex="20" Width="390" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,58,10,0" Padding="17" CornerRadius="14" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" Visibility="{Binding IsToastVisible, Converter={StaticResource BoolToVisibility}}">
+            <Border.RenderTransform><TranslateTransform X="0"/></Border.RenderTransform>
+            <Border.Triggers><EventTrigger RoutedEvent="Border.Loaded"><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" From="420" To="0" Duration="0:0:0.3"><DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></BeginStoryboard></EventTrigger></Border.Triggers>
+            <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><TextBlock Text="Yêu cầu nhận file" FontSize="16" FontWeight="Bold"/><TextBlock Grid.Row="1" Margin="0,7,0,12"><Run Text="{Binding Incoming.SenderName, Mode=OneWay}" FontWeight="SemiBold"/><Run Text=" muốn gửi "/><Run Text="{Binding Incoming.FileName, Mode=OneWay}"/></TextBlock><StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="Từ chối" Command="{Binding DeclineCommand}"/><Button Content="Chấp nhận" Command="{Binding AcceptCommand}" Margin="8,0,0,0" Background="{DynamicResource AccentBrush}" Foreground="White"/></StackPanel></Grid>
+        </Border>
+
+        <!-- History slide-out -->
+        <Grid Grid.RowSpan="4" Panel.ZIndex="15" Visibility="{Binding IsHistoryOpen, Converter={StaticResource BoolToVisibility}}">
+            <Border Background="#720F172A" MouseLeftButtonDown="Overlay_MouseLeftButtonDown"/>
+            <Border Width="760" HorizontalAlignment="Right" Background="{DynamicResource SurfaceBrush}" Padding="28">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition/></Grid.RowDefinitions>
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="Lịch sử truyền file" FontSize="25" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding HistorySummaryText}" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{Binding CloseHistoryCommand}"/>
+                    </Grid>
+
+                    <Border Grid.Row="1" Background="{DynamicResource SurfaceAltBrush}" CornerRadius="14" Padding="15" Margin="0,22,0,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="1.15*"/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,9,0">
+                                <TextBlock Text="TỪ NGÀY" FontSize="10" Foreground="{DynamicResource MutedBrush}" Margin="1,0,0,5"/>
+                                <DatePicker SelectedDate="{Binding HistoryFrom}" Padding="5" Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="0,0,9,0">
+                                <TextBlock Text="CHIỀU TRUYỀN" FontSize="10" Foreground="{DynamicResource MutedBrush}" Margin="1,0,0,5"/>
+                                <ComboBox SelectedIndex="{Binding HistoryDirection}" Padding="7" Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"><ComboBoxItem Content="Tất cả"/><ComboBoxItem Content="Đã gửi"/><ComboBoxItem Content="Đã nhận"/></ComboBox>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Margin="0,0,9,0">
+                                <TextBlock Text="TỐI THIỂU (MB)" FontSize="10" Foreground="{DynamicResource MutedBrush}" Margin="1,0,0,5"/>
+                                <TextBox Text="{Binding MinimumSizeMb}" Padding="8" Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+                            </StackPanel>
+                            <Button Grid.Column="3" Content="Đặt lại" Command="{Binding ClearHistoryFilterCommand}" VerticalAlignment="Bottom" Padding="11,8"/>
+                            <Button Grid.Column="4" Content="Áp dụng" Command="{Binding ApplyHistoryFilterCommand}" VerticalAlignment="Bottom" Margin="8,0,0,0" Background="{DynamicResource AccentBrush}" Foreground="White"/>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="2">
+                        <TextBlock Text="Chưa có hoạt động truyền file" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" FontSize="14">
+                            <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding HasHistoryItems}" Value="False"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                        </TextBlock>
+                        <ListBox ItemsSource="{Binding HistoryItems}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Focusable" Value="False"/><Setter Property="IsHitTestVisible" Value="False"/><Setter Property="Margin" Value="0,0,0,9"/><Setter Property="Padding" Value="0"/></Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource SurfaceAltBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="13" Padding="14">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/><ColumnDefinition Width="90"/><ColumnDefinition Width="108"/><ColumnDefinition Width="128"/></Grid.ColumnDefinitions>
+                                            <Border Width="34" Height="34" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                                <Border.Style><Style TargetType="Border"><Setter Property="Background" Value="#1A6966F2"/><Style.Triggers><DataTrigger Binding="{Binding Direction}" Value="{x:Static core:TransferDirection.Receive}"><Setter Property="Background" Value="#1A16B88A"/></DataTrigger></Style.Triggers></Style></Border.Style>
+                                                <TextBlock Text="{Binding DirectionSymbol}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/><Style.Triggers><DataTrigger Binding="{Binding Direction}" Value="{x:Static core:TransferDirection.Receive}"><Setter Property="Foreground" Value="{DynamicResource ReceiveBrush}"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+                                            </Border>
+                                            <StackPanel Grid.Column="1" Margin="0,0,14,0">
+                                                <TextBlock Text="{Binding FileName}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding PeerDetails}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
+                                                <TextBlock Text="{Binding HashText}" FontSize="10" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" Margin="0,4,0,0" Visibility="{Binding HasHash, Converter={StaticResource BoolToVisibility}}"/>
+                                                <TextBlock Text="{Binding ErrorText}" FontSize="10" Foreground="{DynamicResource DangerBrush}" TextTrimming="CharacterEllipsis" Margin="0,4,0,0" Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                <TextBlock Text="DUNG LƯỢNG" FontSize="9" Foreground="{DynamicResource MutedBrush}"/>
+                                                <TextBlock Text="{Binding Size, Converter={StaticResource BytesConverter}}" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Margin="0,4,0,0"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding DirectionText}" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,5"/>
+                                                <Border CornerRadius="7" Padding="8,4" HorizontalAlignment="Left">
+                                                    <Border.Style><Style TargetType="Border"><Setter Property="Background" Value="#1A6966F2"/><Style.Triggers><DataTrigger Binding="{Binding Status}" Value="{x:Static core:TransferStatus.Completed}"><Setter Property="Background" Value="#2016B88A"/></DataTrigger><DataTrigger Binding="{Binding Status}" Value="{x:Static core:TransferStatus.Failed}"><Setter Property="Background" Value="#20EB5664"/></DataTrigger><DataTrigger Binding="{Binding Status}" Value="{x:Static core:TransferStatus.Cancelled}"><Setter Property="Background" Value="#20EB5664"/></DataTrigger></Style.Triggers></Style></Border.Style>
+                                                    <TextBlock Text="{Binding StatusText}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"/>
+                                                </Border>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="4" VerticalAlignment="Center">
+                                                <TextBlock Text="THỜI GIAN" FontSize="9" Foreground="{DynamicResource MutedBrush}"/>
+                                                <TextBlock Text="{Binding TimeText}" FontSize="11" Foreground="{DynamicResource TextBrush}" Margin="0,5,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Mobile web QR panel -->
+        <Grid Grid.RowSpan="4" Panel.ZIndex="17" Visibility="{Binding IsWebOpen, Converter={StaticResource BoolToVisibility}}">
+            <Border Background="#66000000"/>
+            <Border Width="440" HorizontalAlignment="Right" Background="{DynamicResource SurfaceBrush}" Padding="28">
+                <StackPanel>
+                    <Grid><TextBlock Text="Kết nối điện thoại" FontSize="24" FontWeight="Bold"/><Button Content="✕" HorizontalAlignment="Right" Command="{Binding CloseWebCommand}"/></Grid>
+                    <TextBlock Text="Quét mã bằng Camera trên iPhone" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,34,0,16"/>
+                    <Border Background="White" CornerRadius="16" Padding="14" HorizontalAlignment="Center"><Image Source="{Binding WebQrImage}" Width="230" Height="230" Stretch="Uniform"/></Border>
+                    <TextBox Text="{Binding WebUrl, Mode=OneWay}" IsReadOnly="True" TextAlignment="Center" FontSize="15" FontWeight="SemiBold" Padding="10" Margin="0,18,0,0" Background="{DynamicResource SurfaceAltBrush}" Foreground="{DynamicResource AccentBrush}" BorderThickness="0"/>
+                    <TextBlock Text="Điện thoại và máy tính phải dùng cùng Wi-Fi. Giữ LanFileDrop đang mở trong lúc truyền file." TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="10,16,10,0"/>
+                    <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="10" Padding="12" Margin="0,20,0,0"><TextBlock Text="File từ điện thoại vẫn cần bạn nhấn Chấp nhận trên Windows trước khi upload bắt đầu." TextWrapping="Wrap"/></Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Settings panel -->
+        <Grid Grid.RowSpan="4" Panel.ZIndex="16" Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}">
+            <Border Background="#720F172A"/>
+            <Border Width="460" HorizontalAlignment="Right" Background="{DynamicResource SurfaceBrush}" Padding="28">
+                <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/></Grid.RowDefinitions>
+                    <Grid><StackPanel><TextBlock Text="Cài đặt" FontSize="25" FontWeight="Bold"/><TextBlock Text="Tùy chỉnh trải nghiệm LanFileDrop" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0"/></StackPanel><Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{Binding CloseSettingsCommand}"/></Grid>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,28,0,0"><StackPanel>
+                        <TextBlock Text="GIAO DIỆN" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedBrush}" Margin="2,0,0,8"/>
+                        <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="12" Padding="16"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="Chế độ tối" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="Giảm độ sáng giao diện khi sử dụng ban đêm." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,5,18,0"/></StackPanel><CheckBox Grid.Column="1" IsChecked="{Binding IsDark}" VerticalAlignment="Center" Width="20" Height="20"/></Grid></Border>
+                        <TextBlock Text="KẾT NỐI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedBrush}" Margin="2,26,0,8"/>
+                        <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="12" Padding="16"><StackPanel><TextBlock Text="Mạng LAN cục bộ" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="UDP 49494  •  TCP 49495  •  Web 49500" Foreground="{DynamicResource MutedBrush}" Margin="0,6,0,0"/><TextBlock Text="Ứng dụng chỉ truyền dữ liệu trong mạng hiện tại, không sử dụng máy chủ trung gian." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,10,0,0"/></StackPanel></Border>
+                        <TextBlock Text="KẾT NỐI IP THỦ CÔNG" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedBrush}" Margin="2,20,0,8"/>
+                        <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="12" Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="Dùng cho Radmin VPN / mạng không broadcast" FontSize="15" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding ManualConnectionMessage}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,6,0,12"/>
+                                <TextBlock Text="TÊN GỢI NHỚ (TÙY CHỌN)" FontSize="9" Foreground="{DynamicResource MutedBrush}" Margin="1,0,0,4"/>
+                                <TextBox Text="{Binding ManualDeviceName, UpdateSourceTrigger=PropertyChanged}" Padding="9" Margin="0,0,0,8" ToolTip="Tên gợi nhớ, có thể để trống"/>
+                                <TextBlock Text="ĐỊA CHỈ IPV4[:PORT]" FontSize="9" Foreground="{DynamicResource MutedBrush}" Margin="1,0,0,4"/>
+                                <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding ManualAddress, UpdateSourceTrigger=PropertyChanged}" Padding="9" ToolTip="IPv4 hoặc IPv4:port"/>
+                                    <Button Grid.Column="1" Content="Thêm thiết bị" Command="{Binding AddManualDeviceCommand}" Margin="8,0,0,0" Background="{DynamicResource AccentBrush}" Foreground="White"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                        <TextBlock Text="LƯU TRỮ" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedBrush}" Margin="2,26,0,8"/>
+                        <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="12" Padding="16"><StackPanel><TextBlock Text="Thư mục nhận file" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="Downloads\LanFileDrop" Foreground="{DynamicResource AccentBrush}" Margin="0,6,0,0"/></StackPanel></Border>
+                    </StackPanel></ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

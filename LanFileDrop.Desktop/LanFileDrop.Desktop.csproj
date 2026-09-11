@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>Assets\Logo\lanfiledrop.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Logo\lanfiledrop-64.png" />
+    <Resource Include="Assets\Logo\lanfiledrop.ico" />
+    <Content Include="Assets\Logo\lanfiledrop-logo-original.png" CopyToOutputDirectory="PreserveNewest" />
+    <ProjectReference Include="..\LanFileDrop.Core\LanFileDrop.Core.csproj" />
+    <ProjectReference Include="..\LanFileDrop.Network\LanFileDrop.Network.csproj" />
+    <PackageReference Include="QRCoder" Version="1.6.0" />
+  </ItemGroup>
+
+</Project>
